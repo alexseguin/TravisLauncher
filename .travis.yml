@@ -1,7 +1,7 @@
 branches:
   only:
       - master
-      
+sudo : true      
 language: android
 android:
   components:
