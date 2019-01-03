@@ -20,8 +20,8 @@ android:
     - extra-android-m2repository
     - addon-google_apis-google-$ANDROID_API_LEVEL
     - sys-img-armeabi-v7a-google_apis-$ANDROID_API_LEVEL
-before_script:
-    - yes | android update sdk --no-ui --filter build-tools-24.0.0,android-24,extra-android-m2repository
+before_install:
+- yes | sdkmanager "platforms;android-25"
 
 script:
     - ./gradlew build check
