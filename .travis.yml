@@ -1,39 +1,37 @@
-branches:
-  only:
-      - master
-sudo : required      
-
 language: android
-
-env:
-  global:
-    - ANDROID_API_LEVEL=21 
-    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
-    - ANDROID_ABI=google_apis/armeabi-v7a
 
 android:
   components:
-    - platform-tools
     - tools
-    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
-    - android-$ANDROID_API_LEVEL
-    # For Google Maps API v1
-    - addon-google_apis-google-$ANDROID_API_LEVEL
-    # Google Play Services
-    - extra-google-google_play_services
-    # Support library
-    - extra-android-support
-    # Latest artifacts in local repository
-    - extra-google-m2repository
+    - platform-tools
+    - tools # appears twice as per Travis docs
+    - build-tools-23.0.1
+    - build-tools-25.0.2
+    - android-4
+    - android-10
+    - android-19
+    - android-23
+    - android-25
     - extra-android-m2repository
-    # Specify at least one system image
-    - sys-img-armeabi-v7a-addon-google_apis-google-$ANDROID_API_LEVEL
-    
-before_script:
-- echo no | android create avd --force -n test -t "Google Inc.:Google APIs:"$ANDROID_API_LEVEL --abi $ANDROID_ABI
-- emulator -avd test -no-skin -no-audio -no-window &
-- android-wait-for-emulator
-- adb shell input keyevent 82 &
+    - sys-img-armeabi-v7a-android-25
 
-script:
-  - ./gradlew connectedCheck -PdisablePreDex
+env:
+  matrix:
+    - ANDROID_TARGET=android-4 ANDROID_ABI=armeabi
+    - ANDROID_TARGET=android-10 ANDROID_ABI=armeabi
+    - ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
+    - ANDROID_TARGET=android-25 ANDROID_ABI=armeabi-v7a
+
+before_script:
+  # Create and start emulator
+  - android list targets
+  - jdk_switcher use oraclejdk8
+  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
+  - emulator -avd test -no-skin -no-audio -no-window &
+  - adb wait-for-device
+  - while [[ `adb shell pm path android` == 'Error'* ]]; do sleep 2; done
+  - adb shell input keyevent 82 &
+
+script: ./gradlew --info connectedAndroidTest
+
+sudo: false
