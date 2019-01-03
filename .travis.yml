@@ -1,48 +1,35 @@
-branches:
-  only:
-      - master
-sudo: required    
-
 language: android
-android:
-  components:
-    - tools
-    - platform-tools
-    - tools # appears twice as per Travis docs
-    - build-tools-23.0.1
-    - build-tools-25.0.2
-    - android-4
-    - android-10
-    - android-19
-    - android-23
-    - android-25
-    # For Google Maps API v1
-    - addon-google_apis-google-$ANDROID_API_LEVEL
-    # Google Play Services
-    - extra-google-google_play_services
-    # Support library
-    - extra-android-support
-    # Latest artifacts in local repository
-    - extra-google-m2repository
-    - extra-android-m2repository
-    - extra-android-m2repository
-    - sys-img-armeabi-v7a-android-25
+jdk: oraclejdk8
 
 env:
-  matrix:
-    - ANDROID_TARGET=android-4 ANDROID_ABI=armeabi
-    - ANDROID_TARGET=android-10 ANDROID_ABI=armeabi
-    - ANDROID_TARGET=android-19 ANDROID_ABI=armeabi-v7a
-    - ANDROID_TARGET=android-25 ANDROID_ABI=armeabi-v7a
+ global:
+    - ANDROID_API_LEVEL=25
+    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
 
+android:
+ components:
+    - tools
+    - platform-tools
+    # The BuildTools version used by your project
+    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+    # The SDK version used to compile your project
+    - android-$ANDROID_API_LEVEL
+    # Additional components
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - addon-google_apis-google-$ANDROID_API_LEVEL
+    - sys-img-armeabi-v7a-google_apis-$ANDROID_API_LEVEL
+  licenses:
+    - 'android-sdk-preview-license-.+'
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
 before_script:
-  # Create and start emulator
-  - android list targets
-  - jdk_switcher use oraclejdk8
-  - echo no | android create avd --force -n test -t $ANDROID_TARGET --abi $ANDROID_ABI
-  - emulator -avd test -no-skin -no-audio -no-window &
-  - adb wait-for-device
-  - while [[ `adb shell pm path android` == 'Error'* ]]; do sleep 2; done
-  - adb shell input keyevent 82 &
+    # Launch emulator before the execution
+    - echo no | android create avd --force -n test -t android-$ANDROID_API_LEVEL --abi google_apis/armeabi-v7a
+    - emulator -avd test -no-audio -no-window &
+    - android-wait-for-emulator
+    - adb shell input keyevent 82 &
 
-script: ./gradlew --info connectedAndroidTest
+script:
+    - ./gradlew build check
