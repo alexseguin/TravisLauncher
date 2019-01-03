@@ -11,7 +11,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -25,7 +24,6 @@ import static org.junit.Assert.assertEquals;
  */
 @RunWith(AndroidJUnit4.class)
 public class ExampleInstrumentedTest {
-    @Test
     public void useAppContext() {
 
         // Context of the app under test.
@@ -36,7 +34,6 @@ public class ExampleInstrumentedTest {
         String result;
     }
 
-    @Test
     public void testAPICall() throws InterruptedException {
 
         final ResponseResult res = new ResponseResult();
