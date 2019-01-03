@@ -1,5 +1,9 @@
-language: android
+branches:
+  only:
+      - master
+sudo: required    
 
+language: android
 android:
   components:
     - tools
@@ -12,6 +16,15 @@ android:
     - android-19
     - android-23
     - android-25
+    # For Google Maps API v1
+    - addon-google_apis-google-$ANDROID_API_LEVEL
+    # Google Play Services
+    - extra-google-google_play_services
+    # Support library
+    - extra-android-support
+    # Latest artifacts in local repository
+    - extra-google-m2repository
+    - extra-android-m2repository
     - extra-android-m2repository
     - sys-img-armeabi-v7a-android-25
 
@@ -33,5 +46,3 @@ before_script:
   - adb shell input keyevent 82 &
 
 script: ./gradlew --info connectedAndroidTest
-
-sudo: false
